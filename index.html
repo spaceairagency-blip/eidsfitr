@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get Your Eid Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&family=Dancing+Script:wght@500;700&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --gold-dark: #9a7a30;
+    --cream: #fdf6e3;
+    --bg: #0d1b2a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--bg);
+    color: #f0ece0;
+    min-height: 100vh;
+  }
+
+  header {
+    text-align: center;
+    padding: 24px 20px 12px;
+  }
+  .donate-banner {
+    display: inline-block;
+    background: linear-gradient(135deg, #2d6a4f, #40916c);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 7px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    margin-bottom: 18px;
+    transition: transform 0.2s;
+    box-shadow: 0 3px 12px rgba(64,145,108,0.4);
+    cursor: pointer;
+  }
+  .donate-banner:hover { transform: scale(1.05); }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 4vw, 36px);
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 1px;
+  }
+  header h1 span { color: #fff; }
+
+  .main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    justify-content: center;
+    padding: 20px 20px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .card-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  #cardCanvas {
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 2px rgba(201,168,76,0.3);
+    max-width: 100%;
+    transition: box-shadow 0.3s;
+    cursor: crosshair;
+  }
+  #cardCanvas:hover { box-shadow: 0 24px 70px rgba(0,0,0,0.7), 0 0 0 3px rgba(201,168,76,0.6); }
+
+  .card-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 11px 24px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.4px;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: #1a1100;
+    box-shadow: 0 4px 16px rgba(201,168,76,0.4);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.55); }
+  .btn-secondary {
+    background: rgba(255,255,255,0.08);
+    color: #f0ece0;
+    border: 1px solid rgba(201,168,76,0.3);
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.13); transform: translateY(-2px); }
+  .btn-danger {
+    background: rgba(196,75,75,0.15);
+    color: #ff9999;
+    border: 1px solid rgba(196,75,75,0.35);
+  }
+  .btn-danger:hover { background: rgba(196,75,75,0.25); transform: translateY(-2px); }
+
+  /* Preview size toggle */
+  .size-toggle {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+  }
+  .size-btn {
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(201,168,76,0.25);
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Lato', sans-serif;
+    letter-spacing: 0.5px;
+  }
+  .size-btn.active {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: #1a1100;
+    border-color: transparent;
+  }
+
+  .controls {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 20px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 400px;
+    backdrop-filter: blur(10px);
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--gold-light);
+    margin-bottom: 18px;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  .tabs {
+    display: flex;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(201,168,76,0.25);
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .tab {
+    flex: 1;
+    min-width: 60px;
+    padding: 8px 4px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    border: none;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .tab.active {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: #1a1100;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .swatch-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .swatch {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  .swatch.selected, .swatch:hover { border-color: var(--gold); transform: scale(1.15); }
+
+  .label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .bg-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .bg-thumb {
+    border-radius: 8px;
+    aspect-ratio: 1;
+    cursor: pointer;
+    border: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.05);
+    font-size: 22px;
+    transition: all 0.2s;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .bg-thumb span { font-size: 9px; color: rgba(255,255,255,0.45); letter-spacing: 0.3px; text-transform: uppercase; }
+  .bg-thumb.selected, .bg-thumb:hover { border-color: var(--gold); transform: scale(1.06); }
+
+  .moon-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .moon-opt {
+    border-radius: 8px;
+    aspect-ratio: 1;
+    cursor: pointer;
+    border: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    background: rgba(255,255,255,0.05);
+    transition: all 0.2s;
+  }
+  .moon-opt.selected, .moon-opt:hover { border-color: var(--gold); transform: scale(1.08); }
+
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 10px;
+    color: #f0ece0;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-group select option { background: #1a1a2e; }
+
+  .range-group { margin-bottom: 14px; }
+  .range-group label { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .range-group label span { color: var(--gold); font-weight: 700; }
+  input[type=range] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.12);
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .toggle-row span { font-size: 13px; color: rgba(255,255,255,0.7); }
+  .toggle {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    cursor: pointer;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    border-radius: 22px;
+    transition: 0.2s;
+  }
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    left: 3px; top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: 0.2s;
+  }
+  .toggle input:checked + .slider { background: var(--gold); }
+  .toggle input:checked + .slider::before { transform: translateX(18px); }
+
+  hr { border-color: rgba(201,168,76,0.15); margin: 14px 0; }
+
+  /* Sticker picker */
+  .sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    margin-bottom: 14px;
+    max-height: 140px;
+    overflow-y: auto;
+  }
+  .sticker-grid::-webkit-scrollbar { width: 4px; }
+  .sticker-grid::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.4); border-radius: 4px; }
+  .sticker-item {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .sticker-item:hover { border-color: var(--gold); transform: scale(1.1); background: rgba(255,255,255,0.1); }
+  .sticker-item.selected { border-color: var(--gold); background: rgba(201,168,76,0.15); }
+
+  .placed-stickers-list {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .sticker-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sticker-tag:hover { background: rgba(196,75,75,0.2); border-color: rgba(196,75,75,0.4); }
+  .sticker-tag .del { color: #ff9999; font-size: 11px; font-weight: 700; }
+
+  /* Font preview options */
+  .font-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .font-opt {
+    padding: 10px 8px;
+    border-radius: 8px;
+    border: 2px solid rgba(201,168,76,0.18);
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px;
+    color: #f0ece0;
+    background: rgba(255,255,255,0.04);
+    transition: all 0.2s;
+    line-height: 1.2;
+  }
+  .font-opt small { display: block; font-size: 10px; color: rgba(255,255,255,0.35); font-family: 'Lato', sans-serif; margin-top: 3px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .font-opt.selected, .font-opt:hover { border-color: var(--gold); background: rgba(201,168,76,0.1); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: linear-gradient(135deg, #2d6a4f, #40916c);
+    color: #fff;
+    padding: 12px 26px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    transition: transform 0.35s cubic-bezier(.22,1,.36,1);
+    z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Particle canvas */
+  #particleCanvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: rgba(255,255,255,0.3);
+    font-size: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .history-strip {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+  }
+  .history-strip::-webkit-scrollbar { height: 3px; }
+  .history-strip::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.4); border-radius: 4px; }
+  .history-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 8px;
+    border: 2px solid rgba(201,168,76,0.3);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    overflow: hidden;
+  }
+  .history-thumb:hover { border-color: var(--gold); transform: scale(1.08); }
+  .history-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .history-empty { font-size: 11px; color: rgba(255,255,255,0.25); font-style: italic; }
+
+  /* Share modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: #0d1b2a;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 20px;
+    padding: 30px 28px;
+    width: 100%;
+    max-width: 380px;
+    transform: translateY(20px);
+    transition: transform 0.25s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal h3 { font-family: 'Playfair Display', serif; color: var(--gold-light); margin-bottom: 16px; text-align: center; font-size: 20px; }
+  .share-preview { width: 100%; border-radius: 12px; margin-bottom: 16px; }
+  .share-link-box {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .share-link-box input {
+    flex: 1;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 10px;
+    color: #f0ece0;
+    font-size: 12px;
+    padding: 9px 12px;
+    outline: none;
+  }
+  .modal-close { position: absolute; top: 14px; right: 18px; background: none; border: none; color: rgba(255,255,255,0.4); font-size: 22px; cursor: pointer; transition: color 0.2s; }
+  .modal-close:hover { color: #fff; }
+
+  @media (max-width: 700px) {
+    .main { flex-direction: column; align-items: center; }
+    .controls { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particleCanvas"></canvas>
+
+<header style="position:relative;z-index:1;">
+  <div><a class="donate-banner" href="#" onclick="return false;">🇵🇸 Donate for Gaza</a></div>
+  <h1><span>Get Your</span> Eid Card</h1>
+</header>
+
+<div class="main" style="position:relative;z-index:1;">
+  <div class="card-wrapper">
+    <!-- Size toggle -->
+    <div class="size-toggle">
+      <button class="size-btn active" onclick="setSize('square',this)">Square</button>
+      <button class="size-btn" onclick="setSize('portrait',this)">Portrait</button>
+      <button class="size-btn" onclick="setSize('landscape',this)">Landscape</button>
+    </div>
+
+    <canvas id="cardCanvas" width="500" height="500"></canvas>
+
+    <div class="card-actions">
+      <button class="btn btn-primary" onclick="downloadCard()">⬇ Download</button>
+      <button class="btn btn-secondary" onclick="copyCard()">📋 Copy</button>
+      <button class="btn btn-secondary" onclick="openShareModal()">🔗 Share</button>
+      <button class="btn btn-secondary" onclick="randomize()">🎲 Random</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="section-title">✨ Eid Mubarak ✨</div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('colors',this)">Colors</button>
+      <button class="tab" onclick="switchTab('images',this)">BG</button>
+      <button class="tab" onclick="switchTab('moons',this)">Moon</button>
+      <button class="tab" onclick="switchTab('fonts',this)">Fonts</button>
+      <button class="tab" onclick="switchTab('stickers',this)">Stickers</button>
+      <button class="tab" onclick="switchTab('text',this)">Text</button>
+      <button class="tab" onclick="switchTab('effects',this)">FX</button>
+      <button class="tab" onclick="switchTab('history',this)">History</button>
+    </div>
+
+    <!-- COLORS -->
+    <div id="tab-colors" class="panel active">
+      <div class="label">Background Color</div>
+      <div class="swatch-group" id="bgColors"></div>
+      <div class="label">Accent Color</div>
+      <div class="swatch-group" id="accentColors"></div>
+      <div class="label">Text Color</div>
+      <div class="swatch-group" id="textColors"></div>
+    </div>
+
+    <!-- BG THEME -->
+    <div id="tab-images" class="panel">
+      <div class="label">Background Theme</div>
+      <div class="bg-grid" id="bgImages"></div>
+    </div>
+
+    <!-- MOONS -->
+    <div id="tab-moons" class="panel">
+      <div class="label">Moon Style</div>
+      <div class="moon-grid" id="moonGrid"></div>
+      <hr>
+      <div class="toggle-row">
+        <span>Show Moon</span>
+        <label class="toggle"><input type="checkbox" id="showMoon" checked onchange="render()"><span class="slider"></span></label>
+      </div>
+      <div class="range-group">
+        <label>Moon Size <span id="moonSizeVal">30</span></label>
+        <input type="range" min="15" max="60" value="30" id="moonSize" oninput="document.getElementById('moonSizeVal').textContent=this.value;render()">
+      </div>
+      <div class="range-group">
+        <label>Moon Position X <span id="moonXVal">77</span>%</label>
+        <input type="range" min="10" max="90" value="77" id="moonX" oninput="document.getElementById('moonXVal').textContent=this.value;render()">
+      </div>
+      <div class="range-group">
+        <label>Moon Position Y <span id="moonYVal">17</span>%</label>
+        <input type="range" min="5" max="50" value="17" id="moonY" oninput="document.getElementById('moonYVal').textContent=this.value;render()">
+      </div>
+    </div>
+
+    <!-- FONTS -->
+    <div id="tab-fonts" class="panel">
+      <div class="label">Title Font</div>
+      <div class="font-grid" id="fontGrid"></div>
+      <hr>
+      <div class="range-group">
+        <label>Title Size <span id="titleSizeVal">43</span>px</label>
+        <input type="range" min="24" max="64" value="43" id="titleSize" oninput="document.getElementById('titleSizeVal').textContent=this.value;render()">
+      </div>
+      <div class="range-group">
+        <label>Message Size <span id="msgSizeVal">15</span>px</label>
+        <input type="range" min="10" max="22" value="15" id="msgSize" oninput="document.getElementById('msgSizeVal').textContent=this.value;render()">
+      </div>
+      <div class="toggle-row">
+        <span>Show Arabic</span>
+        <label class="toggle"><input type="checkbox" id="showArabic" checked onchange="render()"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Show Subtitle</span>
+        <label class="toggle"><input type="checkbox" id="showSubtitle" checked onchange="render()"><span class="slider"></span></label>
+      </div>
+      <div class="form-group">
+        <label>Custom Subtitle</label>
+        <input type="text" id="subtitleField" value="عيد مبارك" placeholder="Subtitle text" oninput="render()">
+      </div>
+    </div>
+
+    <!-- STICKERS -->
+    <div id="tab-stickers" class="panel">
+      <div class="label">Tap a sticker to place it on the card</div>
+      <div class="sticker-grid" id="stickerGrid"></div>
+      <div class="label" style="margin-top:8px;">Placed Stickers <span style="color:rgba(255,255,255,0.25);font-size:10px;">(click to remove)</span></div>
+      <div class="placed-stickers-list" id="placedStickers"></div>
+      <hr>
+      <button class="btn btn-danger" style="width:100%;justify-content:center;font-size:13px;padding:9px;" onclick="clearStickers()">🗑 Clear All Stickers</button>
+    </div>
+
+    <!-- TEXT -->
+    <div id="tab-text" class="panel">
+      <div class="form-group">
+        <label>To</label>
+        <input type="text" id="toField" placeholder="Recipient name" oninput="render()">
+      </div>
+      <div class="toggle-row">
+        <span>Hide recipient</span>
+        <label class="toggle"><input type="checkbox" id="hideRecipient" onchange="render()"><span class="slider"></span></label>
+      </div>
+      <div class="form-group">
+        <label>From</label>
+        <input type="text" id="fromField" placeholder="Your name" oninput="render()">
+      </div>
+      <div class="form-group">
+        <label>Select a template</label>
+        <select id="msgTemplate" onchange="applyTemplate()">
+          <option value="Dear {{to}},&#10;&#10;Wishing you a blessed and joyful Eid Mubarak! May this special day bring happiness and peace to you and your family.&#10;&#10;With love,&#10;{{from}}">Dear {{to}}, (Warm)</option>
+          <option value="To my dear {{to}},&#10;&#10;Eid Mubarak! May Allah bless you with love, happiness, and prosperity.&#10;&#10;Yours truly,&#10;{{from}}">To my dear {{to}}</option>
+          <option value="{{to}},&#10;&#10;Eid Mubarak! May you and your loved ones have a wonderful celebration filled with joy.&#10;&#10;— {{from}}">{{to}}, (Casual)</option>
+          <option value="Dear {{to}},&#10;&#10;May the blessings of Eid fill your heart with joy and peace. Eid Mubarak!&#10;&#10;{{from}}">Dear {{to}}, (Blessings)</option>
+          <option value="{{to}},&#10;&#10;Eid Mubarak! May this holy day bring joy, health, and prosperity to you and your family.&#10;&#10;{{from}}">{{to}}, (Festive)</option>
+          <option value="{{to}},&#10;&#10;As the crescent moon graces the sky and the spirit of Eid fills the air, may your heart be filled with endless joy and your home with laughter.&#10;&#10;Eid Mubarak! 🌙&#10;{{from}}">{{to}}, (Poetic)</option>
+          <option value="{{to}},&#10;&#10;Taqabbal Allahu Minna wa Minkum. May Allah accept our prayers and yours. Wishing you a joyful and blessed Eid!&#10;&#10;{{from}}">{{to}}, (Islamic)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Custom Message</label>
+        <textarea id="customMsg" placeholder="Use {{ to }} and {{ from }} as placeholders" oninput="render()"></textarea>
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px;">Use {{ to }} and {{ from }} as placeholders</div>
+      </div>
+    </div>
+
+    <!-- EFFECTS -->
+    <div id="tab-effects" class="panel">
+      <div class="toggle-row">
+        <span>Sparkles / Confetti</span>
+        <label class="toggle"><input type="checkbox" id="showSparkles" onchange="render()"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Glow on title</span>
+        <label class="toggle"><input type="checkbox" id="titleGlow" checked onchange="render()"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Vignette overlay</span>
+        <label class="toggle"><input type="checkbox" id="vignette" onchange="render()"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Noise texture</span>
+        <label class="toggle"><input type="checkbox" id="noiseEffect" onchange="render()"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Animated BG Particles</span>
+        <label class="toggle"><input type="checkbox" id="animParticles" onchange="toggleParticles()"><span class="slider"></span></label>
+      </div>
+      <hr>
+      <div class="range-group">
+        <label>Border Width <span id="borderWVal">13</span>px</label>
+        <input type="range" min="0" max="30" value="13" id="borderW" oninput="document.getElementById('borderWVal').textContent=this.value;render()">
+      </div>
+      <div class="range-group">
+        <label>Corner Ornament Size <span id="ornamentVal">55</span></label>
+        <input type="range" min="20" max="90" value="55" id="ornamentSize" oninput="document.getElementById('ornamentVal').textContent=this.value;render()">
+      </div>
+      <div class="range-group">
+        <label>Opacity / Saturation <span id="opacityVal">100</span>%</label>
+        <input type="range" min="30" max="100" value="100" id="cardOpacity" oninput="document.getElementById('opacityVal').textContent=this.value;updateCanvasOpacity()">
+      </div>
+      <hr>
+      <div class="label">Quick Preset Effects</div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;">
+        <button class="btn btn-secondary" style="font-size:12px;padding:7px 14px;" onclick="applyPreset('golden')">✨ Golden</button>
+        <button class="btn btn-secondary" style="font-size:12px;padding:7px 14px;" onclick="applyPreset('night')">🌃 Night</button>
+        <button class="btn btn-secondary" style="font-size:12px;padding:7px 14px;" onclick="applyPreset('emerald')">💚 Emerald</button>
+        <button class="btn btn-secondary" style="font-size:12px;padding:7px 14px;" onclick="applyPreset('rose')">🌹 Rose</button>
+        <button class="btn btn-secondary" style="font-size:12px;padding:7px 14px;" onclick="applyPreset('ocean')">🌊 Ocean</button>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="tab-history" class="panel">
+      <div class="label">Recent Designs</div>
+      <div class="history-strip" id="historyStrip">
+        <div class="history-empty">No history yet — make some designs!</div>
+      </div>
+      <hr>
+      <button class="btn btn-danger" style="width:100%;justify-content:center;font-size:13px;padding:9px;" onclick="clearHistory()">🗑 Clear History</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Share modal -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal" style="position:relative;">
+    <button class="modal-close" onclick="closeShareModal()">×</button>
+    <h3>Share Your Card</h3>
+    <img id="sharePreviewImg" class="share-preview" src="" alt="Preview">
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-primary" style="justify-content:center;" onclick="downloadCard()">⬇ Download PNG</button>
+      <button class="btn btn-secondary" style="justify-content:center;" onclick="copyCard()">📋 Copy to Clipboard</button>
+      <button class="btn btn-secondary" style="justify-content:center;" onclick="shareNative()">📤 Share via...</button>
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.3);text-align:center;">
+      Download the image then share it on WhatsApp, Messenger, or any platform.
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>Developed by <strong>M. T. H. Titumir</strong> &nbsp;|&nbsp; Made with ❤️</footer>
+
+<script>
+// ========================
+// STATE
+// ========================
+const state = {
+  bgColor: '#0d2137',
+  accentColor: '#c9a84c',
+  textColor: '#ffffff',
+  bgTheme: 'geometric',
+  moonStyle: 0,
+  font: 'Playfair Display',
+  stickers: [], // {emoji, x, y, size}
+  cardW: 500,
+  cardH: 500,
+};
+
+const bgColorOptions = ['#0d2137','#1a0a2e','#0f2d1e','#2a0a0a','#1a1500','#0d0d0d','#0a1a2a','#1e0a1e','#002020','#1a0f05','#15151f','#06192d'];
+const accentColorOptions = ['#c9a84c','#e8c96a','#f0d080','#40916c','#52b788','#e07b39','#c44b4b','#7c6dba','#4a90d9','#d4a5a5','#a0c878','#ff8fa3'];
+const textColorOptions = ['#ffffff','#fdf6e3','#ffe5b4','#c9f0e0','#ffd6a5','#d4b8e0','#ffc8c8','#b8d4f8','#f0f0c0','#e0e0e0','#d4c8b8','#c0f0f0'];
+const bgThemes = [
+  {id:'geometric',label:'🔷',name:'Geo'},
+  {id:'stars',label:'⭐',name:'Stars'},
+  {id:'floral',label:'🌸',name:'Floral'},
+  {id:'arch',label:'🕌',name:'Arch'},
+  {id:'gradient',label:'🌅',name:'Glow'},
+  {id:'minimal',label:'✦',name:'Clean'},
+  {id:'mandala',label:'🌀',name:'Mandala'},
+  {id:'chevron',label:'◈',name:'Zigzag'},
+];
+const moonEmoji = ['🌙','☽','🌛','🌜'];
+const fontOptions = [
+  {name:'Playfair Display', label:'Playfair', preview:'Eid'},
+  {name:'Dancing Script', label:'Script', preview:'Eid'},
+  {name:'Cinzel', label:'Cinzel', preview:'Eid'},
+  {name:'Amiri', label:'Amiri', preview:'Eid'},
+  {name:'Georgia', label:'Georgia', preview:'Eid'},
+  {name:'serif', label:'Classic', preview:'Eid'},
+];
+const stickers = ['🌙','⭐','✨','🌟','💫','🎊','🎉','🎁','🕌','📿','🌺','🌸','🌹','🌷','🌼','🦋','🕊️','🌴','🌿','🍃','❤️','💛','💚','💜','🧡','🤍','🙏','✋','👐','🫶','🌙✨','🎆'];
+
+// ========================
+// CANVAS SETUP
+// ========================
+const canvas = document.getElementById('cardCanvas');
+const ctx = canvas.getContext('2d');
+
+function setSize(mode, btn) {
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (mode === 'square') { state.cardW = 500; state.cardH = 500; }
+  else if (mode === 'portrait') { state.cardW = 420; state.cardH = 600; }
+  else if (mode === 'landscape') { state.cardW = 600; state.cardH = 420; }
+  canvas.width = state.cardW;
+  canvas.height = state.cardH;
+  render();
+}
+
+// ========================
+// BUILD UI
+// ========================
+function buildSwatches(cid, colors, key) {
+  const el = document.getElementById(cid);
+  colors.forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'swatch' + (state[key]===c?' selected':'');
+    s.style.background = c;
+    s.onclick = () => {
+      state[key] = c;
+      el.querySelectorAll('.swatch').forEach(x=>x.classList.remove('selected'));
+      s.classList.add('selected');
+      render();
+    };
+    el.appendChild(s);
+  });
+}
+
+function buildBgGrid() {
+  const el = document.getElementById('bgImages');
+  bgThemes.forEach(t => {
+    const d = document.createElement('div');
+    d.className = 'bg-thumb'+(state.bgTheme===t.id?' selected':'');
+    d.innerHTML = t.label + `<span>${t.name}</span>`;
+    d.onclick = () => {
+      state.bgTheme = t.id;
+      el.querySelectorAll('.bg-thumb').forEach(x=>x.classList.remove('selected'));
+      d.classList.add('selected');
+      render();
+    };
+    el.appendChild(d);
+  });
+}
+
+function buildMoonGrid() {
+  const el = document.getElementById('moonGrid');
+  moonEmoji.forEach((m, i) => {
+    const d = document.createElement('div');
+    d.className = 'moon-opt'+(state.moonStyle===i?' selected':'');
+    d.textContent = m;
+    d.onclick = () => {
+      state.moonStyle = i;
+      el.querySelectorAll('.moon-opt').forEach(x=>x.classList.remove('selected'));
+      d.classList.add('selected');
+      render();
+    };
+    el.appendChild(d);
+  });
+}
+
+function buildFontGrid() {
+  const el = document.getElementById('fontGrid');
+  fontOptions.forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'font-opt' + (state.font===f.name?' selected':'');
+    d.innerHTML = `<span style="font-family:'${f.name}',serif;font-size:18px;">${f.preview}</span><small>${f.label}</small>`;
+    d.onclick = () => {
+      state.font = f.name;
+      el.querySelectorAll('.font-opt').forEach(x=>x.classList.remove('selected'));
+      d.classList.add('selected');
+      render();
+    };
+    el.appendChild(d);
+  });
+}
+
+function buildStickerGrid() {
+  const el = document.getElementById('stickerGrid');
+  stickers.forEach(em => {
+    const d = document.createElement('div');
+    d.className = 'sticker-item';
+    d.textContent = em;
+    d.onclick = () => {
+      // Place at random position
+      state.stickers.push({
+        emoji: em,
+        x: 60 + Math.random() * (state.cardW - 120),
+        y: 200 + Math.random() * (state.cardH - 280),
+        size: 28 + Math.random() * 16
+      });
+      updatePlacedStickers();
+      render();
+      showToast('Sticker placed! 🎉');
+    };
+    el.appendChild(d);
+  });
+}
+
+function updatePlacedStickers() {
+  const el = document.getElementById('placedStickers');
+  el.innerHTML = '';
+  if (state.stickers.length === 0) {
+    el.innerHTML = '<span class="history-empty">No stickers placed yet</span>';
+    return;
+  }
+  state.stickers.forEach((s, i) => {
+    const tag = document.createElement('div');
+    tag.className = 'sticker-tag';
+    tag.innerHTML = `${s.emoji} <span class="del">✕</span>`;
+    tag.onclick = () => { state.stickers.splice(i, 1); updatePlacedStickers(); render(); };
+    el.appendChild(tag);
+  });
+}
+
+function clearStickers() { state.stickers = []; updatePlacedStickers(); render(); showToast('Stickers cleared'); }
+
+// Allow dragging stickers on canvas
+let dragIdx = -1, dragOffX = 0, dragOffY = 0;
+canvas.addEventListener('mousedown', e => {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = state.cardW / rect.width;
+  const scaleY = state.cardH / rect.height;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * scaleY;
+  for (let i = state.stickers.length - 1; i >= 0; i--) {
+    const s = state.stickers[i];
+    if (Math.abs(mx - s.x) < s.size && Math.abs(my - s.y) < s.size) {
+      dragIdx = i; dragOffX = mx - s.x; dragOffY = my - s.y; return;
+    }
+  }
+});
+canvas.addEventListener('mousemove', e => {
+  if (dragIdx < 0) return;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = state.cardW / rect.width;
+  const scaleY = state.cardH / rect.height;
+  state.stickers[dragIdx].x = (e.clientX - rect.left) * scaleX - dragOffX;
+  state.stickers[dragIdx].y = (e.clientY - rect.top) * scaleY - dragOffY;
+  render();
+});
+canvas.addEventListener('mouseup', () => { dragIdx = -1; });
+canvas.addEventListener('touchstart', e => {
+  const t = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = state.cardW / rect.width;
+  const scaleY = state.cardH / rect.height;
+  const mx = (t.clientX - rect.left) * scaleX;
+  const my = (t.clientY - rect.top) * scaleY;
+  for (let i = state.stickers.length - 1; i >= 0; i--) {
+    const s = state.stickers[i];
+    if (Math.abs(mx - s.x) < s.size * 1.5 && Math.abs(my - s.y) < s.size * 1.5) {
+      dragIdx = i; dragOffX = mx - s.x; dragOffY = my - s.y;
+      e.preventDefault(); return;
+    }
+  }
+}, {passive: false});
+canvas.addEventListener('touchmove', e => {
+  if (dragIdx < 0) return;
+  const t = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = state.cardW / rect.width;
+  const scaleY = state.cardH / rect.height;
+  state.stickers[dragIdx].x = (t.clientX - rect.left) * scaleX - dragOffX;
+  state.stickers[dragIdx].y = (t.clientY - rect.top) * scaleY - dragOffY;
+  render();
+  e.preventDefault();
+}, {passive: false});
+canvas.addEventListener('touchend', () => { dragIdx = -1; });
+
+// ========================
+// TABS
+// ========================
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function applyTemplate() {
+  const v = document.getElementById('msgTemplate').value;
+  document.getElementById('customMsg').value = v;
+  render();
+}
+
+// ========================
+// DRAW HELPERS
+// ========================
+function hexRgb(hex) {
+  return { r:parseInt(hex.slice(1,3),16), g:parseInt(hex.slice(3,5),16), b:parseInt(hex.slice(5,7),16) };
+}
+
+function drawStar6(c, cx, cy, outerR, innerR) {
+  const spikes = 6, step = Math.PI/spikes;
+  let rot = -Math.PI/2;
+  c.beginPath();
+  c.moveTo(cx+Math.cos(rot)*outerR, cy+Math.sin(rot)*outerR);
+  for(let i=0;i<spikes;i++){
+    rot+=step; c.lineTo(cx+Math.cos(rot)*innerR, cy+Math.sin(rot)*innerR);
+    rot+=step; c.lineTo(cx+Math.cos(rot)*outerR, cy+Math.sin(rot)*outerR);
+  }
+  c.closePath();
+}
+
+function drawBackground(W, H) {
+  const bg = state.bgColor, acc = state.accentColor;
+  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+
+  ctx.save();
+  if (state.bgTheme === 'geometric') {
+    ctx.globalAlpha=0.07; ctx.strokeStyle=acc; ctx.lineWidth=1;
+    const sz=55;
+    for(let x=sz/2;x<W+sz;x+=sz) for(let y=sz/2;y<H+sz;y+=sz){ drawStar6(ctx,x,y,sz*0.38,sz*0.16); ctx.stroke(); }
+  } else if (state.bgTheme === 'stars') {
+    ctx.fillStyle=acc;
+    for(let i=0;i<90;i++){
+      const x=(Math.sin(i*137.508)*W/2+W/2)%W, y=(Math.cos(i*137.508+0.7)*H/2+H/2)%H;
+      ctx.globalAlpha=0.1+((i%5)*0.04);
+      ctx.beginPath(); ctx.arc(x,y,i%3===0?2.2:1,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha=0.05; ctx.strokeStyle=acc; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(W*0.82,H*0.14,75,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(W*0.14,H*0.82,55,0,Math.PI*2); ctx.stroke();
+  } else if (state.bgTheme === 'floral') {
+    ctx.globalAlpha=0.07; ctx.strokeStyle=acc; ctx.lineWidth=1;
+    const cols = Math.ceil(W/65);
+    for(let i=0;i<=cols;i++){
+      const fx=30+i*65;
+      for(const fy of [45, H-45]){
+        for(let p=0;p<8;p++){ const a=p/8*Math.PI*2; ctx.beginPath(); ctx.arc(fx+Math.cos(a)*18,fy+Math.sin(a)*18,15,0,Math.PI*2); ctx.stroke(); }
+      }
+    }
+  } else if (state.bgTheme === 'arch') {
+    ctx.globalAlpha=0.06; ctx.fillStyle=acc;
+    ctx.beginPath(); ctx.arc(W/2,H*0.32,W*0.17,Math.PI,0); ctx.fill();
+    ctx.fillRect(W/2-W*0.26,H*0.32,W*0.035,H*0.28);
+    ctx.fillRect(W/2+W*0.22,H*0.32,W*0.035,H*0.28);
+    ctx.beginPath(); ctx.arc(W/2-W*0.242,H*0.32,W*0.025,Math.PI,0); ctx.fill();
+    ctx.beginPath(); ctx.arc(W/2+W*0.238,H*0.32,W*0.025,Math.PI,0); ctx.fill();
+  } else if (state.bgTheme === 'gradient') {
+    const rgb=hexRgb(acc);
+    const gr=ctx.createRadialGradient(W/2,H*0.3,0,W/2,H/2,W*0.75);
+    gr.addColorStop(0,`rgba(${rgb.r},${rgb.g},${rgb.b},0.22)`);
+    gr.addColorStop(1,'transparent');
+    ctx.fillStyle=gr; ctx.fillRect(0,0,W,H);
+  } else if (state.bgTheme === 'mandala') {
+    ctx.globalAlpha=0.06; ctx.strokeStyle=acc; ctx.lineWidth=1;
+    const cx=W/2, cy=H/2;
+    for(let r=30;r<Math.max(W,H)*0.75;r+=28){
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+      const petals = Math.floor(r/14);
+      for(let p=0;p<petals;p++){
+        const a=p/petals*Math.PI*2;
+        ctx.beginPath();
+        ctx.moveTo(cx,cy);
+        ctx.quadraticCurveTo(cx+Math.cos(a+0.2)*r*0.65,cy+Math.sin(a+0.2)*r*0.65,cx+Math.cos(a)*r,cy+Math.sin(a)*r);
+        ctx.stroke();
+      }
+    }
+  } else if (state.bgTheme === 'chevron') {
+    ctx.globalAlpha=0.06; ctx.strokeStyle=acc; ctx.lineWidth=1.5;
+    const sz=34;
+    for(let row=-1;row<Math.ceil(H/sz)+1;row++){
+      for(let col=-1;col<Math.ceil(W/(sz*2))+1;col++){
+        const x=col*sz*2+(row%2===0?0:sz);
+        const y=row*sz*0.6;
+        ctx.beginPath();
+        ctx.moveTo(x,y+sz*0.3);
+        ctx.lineTo(x+sz*0.5,y);
+        ctx.lineTo(x+sz,y+sz*0.3);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.restore();
+
+  // Corner ornaments
+  const ornSz = parseInt(document.getElementById('ornamentSize').value);
+  [[0,0,0],[W,0,Math.PI/2],[0,H,-Math.PI/2],[W,H,Math.PI]].forEach(([cx,cy,rot])=>{
+    ctx.save();
+    ctx.translate(cx,cy); ctx.rotate(rot);
+    ctx.strokeStyle=acc; ctx.lineWidth=1.5; ctx.globalAlpha=0.45;
+    const s=ornSz/55;
+    ctx.beginPath(); ctx.moveTo(16*s,16*s); ctx.lineTo(55*s,16*s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(16*s,16*s); ctx.lineTo(16*s,55*s); ctx.stroke();
+    ctx.beginPath(); ctx.arc(16*s,16*s,22*s,0,Math.PI/2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(16*s,16*s,34*s,0,Math.PI/2); ctx.stroke();
+    ctx.restore();
+  });
+
+  // Border
+  const bw = parseInt(document.getElementById('borderW').value);
+  if (bw > 0) {
+    const rgb=hexRgb(acc);
+    const gr=ctx.createLinearGradient(0,0,W,H);
+    gr.addColorStop(0,acc); gr.addColorStop(0.5,`rgba(${rgb.r},${rgb.g},${rgb.b},0.4)`); gr.addColorStop(1,acc);
+    ctx.strokeStyle=gr; ctx.lineWidth=bw; ctx.strokeRect(bw/2,bw/2,W-bw,H-bw);
+    ctx.save(); ctx.globalAlpha=0.28; ctx.strokeStyle=acc; ctx.lineWidth=1;
+    ctx.strokeRect(bw+9,bw+9,W-bw*2-18,H-bw*2-18); ctx.restore();
+  }
+
+  // Vignette
+  if (document.getElementById('vignette').checked) {
+    const vgr = ctx.createRadialGradient(W/2,H/2,W*0.3,W/2,H/2,W*0.75);
+    vgr.addColorStop(0,'transparent');
+    vgr.addColorStop(1,'rgba(0,0,0,0.55)');
+    ctx.fillStyle=vgr; ctx.fillRect(0,0,W,H);
+  }
+
+  // Noise texture
+  if (document.getElementById('noiseEffect').checked) {
+    for(let i=0;i<3000;i++){
+      const x=Math.random()*W, y=Math.random()*H;
+      const v=Math.random()*40;
+      ctx.fillStyle=`rgba(${v},${v},${v},0.05)`;
+      ctx.fillRect(x,y,1,1);
+    }
+  }
+}
+
+function drawMoon(W, H) {
+  if (!document.getElementById('showMoon').checked) return;
+  const acc = state.accentColor;
+  const moonColors=['#f5e6c0','#ffe8a0','#f0d070','#fff5d0'];
+  const col = moonColors[state.moonStyle];
+  const mr = parseInt(document.getElementById('moonSize').value);
+  const mx = W * (parseInt(document.getElementById('moonX').value)/100);
+  const my = H * (parseInt(document.getElementById('moonY').value)/100);
+
+  ctx.save();
+  ctx.fillStyle=col; ctx.shadowColor=col; ctx.shadowBlur=20;
+
+  const moonOps = [
+    {offX:0.38, offY:-0.06, r:0.82},
+    {offX:0.45, offY:-0.05, r:0.80},
+    {offX:0.30, offY:-0.10, r:0.88},
+    {offX:0.55, offY:0,     r:0.75},
+  ];
+  const mo = moonOps[state.moonStyle] || moonOps[0];
+  ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fill();
+  ctx.globalCompositeOperation='destination-out';
+  ctx.beginPath(); ctx.arc(mx+mr*mo.offX,my+mr*mo.offY,mr*mo.r,0,Math.PI*2); ctx.fill();
+  ctx.globalCompositeOperation='source-over';
+  ctx.restore();
+
+  // Star
+  ctx.save();
+  ctx.fillStyle=col; ctx.shadowColor=col; ctx.shadowBlur=12; ctx.globalAlpha=0.92;
+  const sx=mx+mr*0.95, sy=my-mr*0.65, ss=mr*0.22;
+  ctx.beginPath();
+  for(let i=0;i<5;i++){
+    const a=(i*4*Math.PI/5)-Math.PI/2, ia=a+(2*Math.PI/5);
+    if(i===0) ctx.moveTo(sx+Math.cos(a)*ss, sy+Math.sin(a)*ss);
+    else ctx.lineTo(sx+Math.cos(a)*ss, sy+Math.sin(a)*ss);
+    ctx.lineTo(sx+Math.cos(ia)*ss*0.4, sy+Math.sin(ia)*ss*0.4);
+  }
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+function drawSparkles(W, H) {
+  if (!document.getElementById('showSparkles').checked) return;
+  const acc = state.accentColor;
+  const rgb = hexRgb(acc);
+  for (let i=0;i<25;i++) {
+    const x = 30 + Math.random() * (W-60);
+    const y = 30 + Math.random() * (H-60);
+    const sz = 2 + Math.random() * 5;
+    ctx.save();
+    ctx.globalAlpha = 0.15 + Math.random() * 0.35;
+    ctx.fillStyle = acc;
+    ctx.shadowColor = acc; ctx.shadowBlur = 8;
+    ctx.beginPath();
+    for(let p=0;p<4;p++){
+      const a=p/4*Math.PI*2-Math.PI/4;
+      ctx.lineTo(x+Math.cos(a)*sz, y+Math.sin(a)*sz);
+      ctx.lineTo(x+Math.cos(a+Math.PI/4)*sz*0.35, y+Math.sin(a+Math.PI/4)*sz*0.35);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+}
+
+function wrapText(text, x, y, maxW, lineH, align) {
+  const lines = text.split('\n');
+  let curY = y;
+  lines.forEach(line => {
+    if(line.trim()===''){curY+=lineH*0.5;return;}
+    const words=line.split(' '); let cur='';
+    words.forEach(w=>{
+      const test=cur+(cur?' ':'')+w;
+      if(ctx.measureText(test).width>maxW&&cur){
+        ctx.fillText(cur,align==='center'?x:x,curY);
+        cur=w;curY+=lineH;
+      } else cur=test;
+    });
+    if(cur){ctx.fillText(cur,x,curY);curY+=lineH;}
+  });
+  return curY;
+}
+
+// ========================
+// MAIN RENDER
+// ========================
+function render() {
+  const W=state.cardW, H=state.cardH;
+  const acc=state.accentColor, txt=state.textColor;
+  const to=document.getElementById('toField').value;
+  const from=document.getElementById('fromField').value;
+  const hideR=document.getElementById('hideRecipient').checked;
+  let msg=document.getElementById('customMsg').value;
+  if(!msg) msg="Dear {{to}},\n\nWishing you a blessed and joyful Eid Mubarak! May this special day bring happiness and peace to you and your family.\n\nWith love,\n{{from}}";
+
+  const toVal=hideR?'':to;
+  msg=msg.replace(/\{\{\s*to\s*\}\}/g,toVal).replace(/\{\{\s*from\s*\}\}/g,from);
+
+  ctx.clearRect(0,0,W,H);
+  drawBackground(W,H);
+  drawMoon(W,H);
+  drawSparkles(W,H);
+
+  // Decorative line top
+  const titleSize = parseInt(document.getElementById('titleSize').value);
+  const topY = H * 0.2 + titleSize * 0.4;
+
+  ctx.save();
+  ctx.globalAlpha=0.45; ctx.strokeStyle=acc; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(W*0.11,topY-titleSize*0.9); ctx.lineTo(W*0.89,topY-titleSize*0.9); ctx.stroke();
+  ctx.restore();
+
+  // Eid Mubarak title
+  const doGlow = document.getElementById('titleGlow').checked;
+  ctx.save();
+  ctx.textAlign='center';
+  ctx.font=`bold ${titleSize}px "${state.font}", serif`;
+  ctx.fillStyle=acc;
+  if (doGlow) { ctx.shadowColor=acc; ctx.shadowBlur=24; }
+  ctx.fillText('Eid Mubarak',W/2,topY);
+  ctx.shadowBlur=0;
+
+  // Subtitle / Arabic
+  if (document.getElementById('showSubtitle').checked) {
+    const subText = document.getElementById('subtitleField').value || 'عيد مبارك';
+    const isArabicToggle = document.getElementById('showArabic').checked;
+    if (isArabicToggle) {
+      ctx.font=`17px "Amiri", serif`;
+      const rgb=hexRgb(txt);
+      ctx.fillStyle=`rgba(${rgb.r},${rgb.g},${rgb.b},0.7)`;
+      ctx.fillText(subText,W/2,topY+22);
+    }
+  }
+
+  // Decorative line below title
+  ctx.globalAlpha=0.45; ctx.strokeStyle=acc; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(W*0.11,topY+30); ctx.lineTo(W*0.89,topY+30); ctx.stroke();
+  ctx.restore();
+
+  // Message
+  const msgSize = parseInt(document.getElementById('msgSize').value);
+  ctx.save();
+  ctx.textAlign='left';
+  ctx.font=`${msgSize}px "Lato", sans-serif`;
+  ctx.fillStyle=txt;
+  wrapText(msg, W*0.1, topY+52, W*0.8, msgSize*1.6);
+  ctx.restore();
+
+  // Stickers
+  state.stickers.forEach(s => {
+    ctx.save();
+    ctx.font = `${s.size}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(s.emoji, s.x, s.y);
+    ctx.restore();
+  });
+
+  // Bottom decoration
+  ctx.save();
+  ctx.textAlign='center';
+  ctx.font='20px serif';
+  ctx.globalAlpha=0.55;
+  ctx.fillStyle=acc;
+  ctx.fillText('✦  🌙  ✦',W/2,H-38);
+  ctx.restore();
+}
+
+// ========================
+// CANVAS OPACITY (non-destructive)
+// ========================
+function updateCanvasOpacity() {
+  const v = document.getElementById('cardOpacity').value;
+  canvas.style.opacity = v / 100;
+}
+
+// ========================
+// PRESETS
+// ========================
+const presets = {
+  golden:  { bgColor:'#1a1200', accentColor:'#e8c96a', textColor:'#fdf6e3', bgTheme:'geometric' },
+  night:   { bgColor:'#06192d', accentColor:'#4a90d9', textColor:'#e0f0ff', bgTheme:'stars' },
+  emerald: { bgColor:'#0a1e14', accentColor:'#52b788', textColor:'#c9f0e0', bgTheme:'floral' },
+  rose:    { bgColor:'#200a14', accentColor:'#e8698a', textColor:'#ffd0dc', bgTheme:'mandala' },
+  ocean:   { bgColor:'#001520', accentColor:'#00b4d8', textColor:'#caf0f8', bgTheme:'chevron' },
+};
+
+function applyPreset(name) {
+  const p = presets[name];
+  Object.assign(state, p);
+  // Sync swatches
+  ['bgColor','accentColor','textColor'].forEach(key => {
+    const ids = {bgColor:'bgColors',accentColor:'accentColors',textColor:'textColors'};
+    document.querySelectorAll(`#${ids[key]} .swatch`).forEach(s => {
+      s.classList.toggle('selected', s.style.background === hexToRgbStr(state[key]) || s.style.background === state[key]);
+    });
+  });
+  // Sync bg grid
+  document.querySelectorAll('#bgImages .bg-thumb').forEach(d => d.classList.remove('selected'));
+  const bgEl = [...document.querySelectorAll('#bgImages .bg-thumb')].find((_,i) => bgThemes[i].id === state.bgTheme);
+  if (bgEl) bgEl.classList.add('selected');
+  render();
+  showToast(`✨ ${name.charAt(0).toUpperCase()+name.slice(1)} preset applied!`);
+}
+
+function hexToRgbStr(hex) {
+  const {r,g,b} = hexRgb(hex);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+// ========================
+// RANDOMIZE
+// ========================
+function randomize() {
+  state.bgColor = bgColorOptions[Math.floor(Math.random()*bgColorOptions.length)];
+  state.accentColor = accentColorOptions[Math.floor(Math.random()*accentColorOptions.length)];
+  state.textColor = textColorOptions[Math.floor(Math.random()*textColorOptions.length)];
+  state.bgTheme = bgThemes[Math.floor(Math.random()*bgThemes.length)].id;
+  state.moonStyle = Math.floor(Math.random()*4);
+  state.font = fontOptions[Math.floor(Math.random()*fontOptions.length)].name;
+  // Sync moon grid
+  document.querySelectorAll('#moonGrid .moon-opt').forEach((d,i) => d.classList.toggle('selected', i===state.moonStyle));
+  // Sync bg grid
+  document.querySelectorAll('#bgImages .bg-thumb').forEach((d,i) => d.classList.toggle('selected', bgThemes[i].id===state.bgTheme));
+  render();
+  showToast('🎲 Random style applied!');
+}
+
+// ========================
+// HISTORY
+// ========================
+let history = [];
+function saveToHistory() {
+  const thumb = canvas.toDataURL('image/png');
+  history.unshift({ thumb, state: JSON.parse(JSON.stringify(state)) });
+  if (history.length > 8) history.pop();
+  renderHistory();
+}
+function renderHistory() {
+  const el = document.getElementById('historyStrip');
+  if (history.length === 0) { el.innerHTML = '<div class="history-empty">No history yet — make some designs!</div>'; return; }
+  el.innerHTML = '';
+  history.forEach((h, i) => {
+    const d = document.createElement('div');
+    d.className = 'history-thumb';
+    const img = document.createElement('img');
+    img.src = h.thumb;
+    d.appendChild(img);
+    d.title = `Design #${i+1}`;
+    d.onclick = () => {
+      Object.assign(state, h.state);
+      render();
+      showToast('Design restored from history!');
+    };
+    el.appendChild(d);
+  });
+}
+function clearHistory() { history = []; renderHistory(); showToast('History cleared'); }
+
+// ========================
+// DOWNLOAD / COPY / SHARE
+// ========================
+function downloadCard() {
+  saveToHistory();
+  const link=document.createElement('a');
+  link.download='eid-card.png';
+  link.href=canvas.toDataURL('image/png');
+  link.click();
+  showToast('Card downloaded! 🎊');
+}
+
+async function copyCard() {
+  try {
+    canvas.toBlob(async blob => {
+      await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+      showToast('Copied to clipboard! 📋');
+    });
+  } catch { showToast('Copy not supported in this browser'); }
+}
+
+function openShareModal() {
+  document.getElementById('sharePreviewImg').src = canvas.toDataURL('image/png');
+  document.getElementById('shareModal').classList.add('open');
+}
+function closeShareModal() { document.getElementById('shareModal').classList.remove('open'); }
+
+async function shareNative() {
+  try {
+    canvas.toBlob(async blob => {
+      const file = new File([blob], 'eid-card.png', {type:'image/png'});
+      if (navigator.canShare && navigator.canShare({files:[file]})) {
+        await navigator.share({ files:[file], title:'Eid Mubarak!', text:'Wishing you a blessed Eid!' });
+      } else { downloadCard(); }
+    });
+  } catch { downloadCard(); }
+}
+
+// ========================
+// TOAST
+// ========================
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ========================
+// BACKGROUND PARTICLES
+// ========================
+const pCanvas = document.getElementById('particleCanvas');
+const pCtx = pCanvas.getContext('2d');
+let particles = [], animRunning = false, animFrame;
+
+function initParticles() {
+  pCanvas.width = window.innerWidth;
+  pCanvas.height = window.innerHeight;
+  particles = Array.from({length:60}, () => ({
+    x: Math.random()*pCanvas.width,
+    y: Math.random()*pCanvas.height,
+    r: 0.5 + Math.random()*2,
+    vx: (Math.random()-0.5)*0.3,
+    vy: -0.2 - Math.random()*0.4,
+    alpha: 0.1 + Math.random()*0.3,
+  }));
+}
+
+function animateParticles() {
+  if (!animRunning) return;
+  pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.y < -5) { p.y = pCanvas.height + 5; p.x = Math.random()*pCanvas.width; }
+    pCtx.beginPath();
+    pCtx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    pCtx.fillStyle = `rgba(201,168,76,${p.alpha})`;
+    pCtx.fill();
+  });
+  animFrame = requestAnimationFrame(animateParticles);
+}
+
+function toggleParticles() {
+  animRunning = document.getElementById('animParticles').checked;
+  if (animRunning) { initParticles(); animateParticles(); }
+  else { cancelAnimationFrame(animFrame); pCtx.clearRect(0,0,pCanvas.width,pCanvas.height); }
+}
+window.addEventListener('resize', () => { if (animRunning) initParticles(); });
+
+// Close modal on overlay click
+document.getElementById('shareModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('shareModal')) closeShareModal();
+});
+
+// ========================
+// INIT
+// ========================
+buildSwatches('bgColors', bgColorOptions, 'bgColor');
+buildSwatches('accentColors', accentColorOptions, 'accentColor');
+buildSwatches('textColors', textColorOptions, 'textColor');
+buildBgGrid();
+buildMoonGrid();
+buildFontGrid();
+buildStickerGrid();
+updatePlacedStickers();
+
+document.getElementById('customMsg').value = "Dear {{to}},\n\nWishing you a blessed and joyful Eid Mubarak! May this special day bring happiness and peace to you and your family.\n\nWith love,\n{{from}}";
+
+render();
+</script>
+</body>
+</html>
